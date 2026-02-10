@@ -1,0 +1,25 @@
+{
+  "name": "FocusFlow Study Tracker",
+  "short_name": "FocusFlow",
+  "description": "A modern, Material You-inspired study tracker featuring a focus session tracker, countdown timer, and habit board.",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2997/2997314.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2997/2997314.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["productivity", "education", "utilities"]
+}
