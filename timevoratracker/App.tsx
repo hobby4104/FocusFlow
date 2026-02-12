@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { StudySession, Task, Settings, RoutineTask, RoutineCompletion } from './types';
 import { 
@@ -27,6 +26,8 @@ const App: React.FC = () => {
   const [activeSeconds, setActiveSeconds] = useState(0);
   const [showWelcome, setShowWelcome] = useState(false);
   const [tempName, setTempName] = useState('');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newNameValue, setNewNameValue] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeScreen, setActiveScreen] = useState<'home' | 'routine'>('home');
   
@@ -172,6 +173,19 @@ const App: React.FC = () => {
     setShowWelcome(false);
   };
 
+  const handleStartEditingName = () => {
+    setNewNameValue(settings.userName || '');
+    setIsEditingName(true);
+  };
+
+  const handleSaveEditedName = () => {
+    const trimmed = newNameValue.trim();
+    if (trimmed && trimmed !== settings.userName) {
+      handleUpdateSettings({ ...settings, userName: trimmed });
+    }
+    setIsEditingName(false);
+  };
+
   const openAddRoutineModal = () => {
     setEditingRoutineId(null);
     setRoutineFormData({ time: '', activity: '', duration: '', category: '' });
@@ -210,6 +224,37 @@ const App: React.FC = () => {
     touchEndX.current = null;
   };
 
+  const renderUsername = (isMobile: boolean) => {
+    if (isEditingName) {
+      return (
+        <input
+          autoFocus
+          type="text"
+          value={newNameValue}
+          onChange={(e) => setNewNameValue(e.target.value)}
+          onBlur={handleSaveEditedName}
+          onKeyDown={(e) => e.key === 'Enter' && handleSaveEditedName()}
+          className={`bg-transparent border-b border-indigo-500/50 outline-none text-indigo-400 font-medium ${isMobile ? 'text-[11px]' : 'text-base md:text-lg'} w-24 md:w-32`}
+        />
+      );
+    }
+
+    return (
+      <button 
+        className="flex items-center gap-1.5 group cursor-pointer transition-colors text-left" 
+        onClick={handleStartEditingName}
+        title="Edit name"
+      >
+        <span>Hi, {settings.userName || 'there'}.</span>
+        <span className="opacity-30 group-hover:opacity-100 p-0.5 text-indigo-400 transition-opacity">
+          <svg className="w-3 h-3 md:w-3.5 md:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        </span>
+      </button>
+    );
+  };
+
   return (
     <div className="relative h-screen bg-[#0B0F1A] overflow-hidden flex flex-col">
       {/* Fixed Header */}
@@ -218,14 +263,14 @@ const App: React.FC = () => {
           <div className="flex flex-col">
             <div className="flex items-baseline gap-2 md:gap-4">
               <h1 className="serif-heading text-lg md:text-2xl font-bold text-white tracking-tight">Timevora</h1>
-              <span className="hidden md:inline-block serif-heading text-base md:text-lg font-medium text-indigo-400/70">
-                Hi, {settings.userName || 'there'}.
-              </span>
+              <div className="hidden md:block serif-heading text-base md:text-lg font-medium text-indigo-400/70">
+                {renderUsername(false)}
+              </div>
             </div>
             <p className="text-slate-500 text-[7px] md:text-[9px] font-bold uppercase tracking-[0.45em] mt-0.5">Refining Focus</p>
-            <span className="md:hidden serif-heading text-[11px] font-medium text-indigo-400/70 mt-1.5">
-              Hi, {settings.userName || 'there'}.
-            </span>
+            <div className="md:hidden serif-heading text-[11px] font-medium text-indigo-400/70 mt-1.5">
+              {renderUsername(true)}
+            </div>
           </div>
           
           <div className="flex items-center gap-3">
@@ -288,9 +333,6 @@ const App: React.FC = () => {
                 <TaskBoard tasks={tasks} onTasksChange={handleUpdateTasks} />
               </div>
            </main>
-           <footer className="mt-20 py-10 flex items-center justify-center opacity-30 hover:opacity-100 transition-opacity duration-500">
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Timevora</span>
-           </footer>
         </div>
 
         {/* Routine Page Independent Scroll */}
@@ -306,9 +348,6 @@ const App: React.FC = () => {
                onOpenEditModal={openEditRoutineModal}
              />
            </div>
-           <footer className="mt-20 py-10 flex items-center justify-center opacity-30 hover:opacity-100 transition-opacity duration-500">
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Timevora</span>
-           </footer>
         </div>
       </div>
 
